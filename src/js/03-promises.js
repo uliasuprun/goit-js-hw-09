@@ -1,47 +1,39 @@
 import Notiflix from 'notiflix';
-// --- Notify success
-Notiflix.Notify.success(
-  '✅ Fulfilled promise ${position} in ${delay}ms',
-  {
-    timeout: 5000,
-  },
-);
-// --- Notify failure
-Notiflix.Notify.failure(
-  '❌ Rejected promise ${position} in ${delay}ms',
-  {
-    timeout: 5000,
-  },
-);
 
 const form = document.querySelector('.form');
-const formImputDelay = document.querySelector('[name="delay"]');
-const formImputStep = document.querySelector('[name="step"]');
-const formImputAmount = document.querySelector('[name="amount"]');
+const firstDelay = document.querySelector('[name="delay"]');
+const stepDelay = document.querySelector('[name="step"]');
+const amountEL = document.querySelector('[name="amount"]');
 
-form.addEventListener('submit', onSubmitButtonClick);
+form.addEventListener('submit', onButtonClick);
 
-function onSubmitButtonClick (e) {
-e.preventDefaut();
-}
+function onButtonClick(e){
+  e.preventDefault()
 
-/* Напиши скрипт, который при сабмите формы вызывает функцию createPromise(position, delay) столько раз, сколько ввели в поле amount. При каждом вызове передай ей номер создаваемого промиса (position) и задержку учитывая введенную пользователем первую задержку (delay) и шаг (step). */
+  let time = firstDelay.value;
+  const arrayPromise = [
+    {delay: Number(time), position: 1}
+  ];
+  for (let i = 2; i <= Number(amountEL.value); i += 1) {
+    arrayPromise.push( {delay: time = Number(firstDelay.value) + Number(stepDelay.value), position: i})
+  }
+
+  const promises = arrayPromise.map((arr) => {
+    return createPromise(arr.position, arr.delay)
+    .then((onSucces) => {Notiflix.Notify.success(onSucces)})
+    .catch((onError) => {Notiflix.Notify.failure(onError)})
+  });
+};
 
 function createPromise(position, delay) {
-  const shouldResolve = Math.random() > 0.3;
-  if (shouldResolve) {
-    // Fulfill
-  } else {
-    // Reject
-  }
-}
-
-/* Дополни код функции createPromise так, чтобы она возвращала один промис, который выполянется или отклоняется через delay времени. Значением промиса должен быть объект, в котором будут свойства position и delay со значениями одноименных параметров. Используй начальный код функции для выбора того, что нужно сделать с промисом - выполнить или отклонить. */
-
-createPromise(2, 1500)
-  .then(({ position, delay }) => {
-    console.log(`✅ Fulfilled promise ${position} in ${delay}ms`);
+  return new Promise ((resolve, reject) => {
+    const result = Math.random() > 0.3;
+    setTimeout(() => {
+      if (result) {
+        resolve(`Fulfilled promise ${position} in ${delay}ms`);
+      } else {
+        reject(`Rejected promise ${position} in ${delay}ms`)
+      }
+    }, delay)
   })
-  .catch(({ position, delay }) => {
-    console.log(`❌ Rejected promise ${position} in ${delay}ms`);
-  });
+};
